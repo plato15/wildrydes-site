@@ -55,6 +55,7 @@ WildRydes.map = WildRydes.map || {};
 
     // Register click handler for #request button
     $(function onDocReady() {
+        $('#reportForm').submit(submitReport);
         $('#request').click(handleRequestClick);
         $(WildRydes.map).on('pickupChange', handlePickupChanged);
 
@@ -77,9 +78,55 @@ WildRydes.map = WildRydes.map || {};
     }
 
     function handleRequestClick(event) {
-        var = WildRydes.map.selectedPoint;
+        var pickupLocation = WildRydes.map.selectedPoint;
         event.preventDefault();
         requestUnicorn(pickupLocation);
+    }
+    
+    function submitReport(event) {
+        var title = $('#title').val();
+        var location = $('#location').val();
+        var description = $('#description').val();
+        event.preventDefault();
+        var appuser = 'test_user';
+        var thiscase = {
+            user: appuser,
+            title: title,
+            description: description,
+            location: function(){var usrlocation = {
+              loc_name: location,
+              loc_id: "765"
+            };
+            return usrlocation;}
+          };
+        submitCase(thiscase);  
+    }
+    function submitCase(thiscase) {
+        $.ajax({
+            method: 'POST',
+            url: _config.api.invokeUrl + '/case',
+            headers: {
+                Authorization: authToken
+            },
+            data: JSON.stringify({
+                thiscase: {
+                    user: thiscase.appuser,
+                    title: thiscase.title,
+                    description: thiscase.description,
+                    location: {
+                      loc_name: thiscase.location().loc_name,
+                      loc_id: thiscase.location().loc_id
+                    }
+                }
+            }),
+            contentType: 'application/json',
+            success: alert('report sent'),
+            error: function ajaxError(jqXHR, textStatus, errorThrown) {
+                console.error('Error requesting ride: ', textStatus, ', Details: ', errorThrown);
+                console.error('Response: ', jqXHR.responseText);
+                alert('An error occured when requesting your unicorn:\n' + jqXHR.responseText);
+            }
+        });
     }
 
     function animateArrival(callback) {
