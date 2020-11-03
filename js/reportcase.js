@@ -109,14 +109,12 @@ WildRydes.map = WildRydes.map || {};
                 Authorization: authToken
             },
             data: JSON.stringify({
-                thiscase: {
                     user: thiscase.appuser,
                     title: thiscase.title,
                     description: thiscase.description,
                     location: {
                       loc_name: thiscase.location().loc_name,
                       loc_id: thiscase.location().loc_id
-                    }
                 }
             }),
             contentType: 'application/json',
